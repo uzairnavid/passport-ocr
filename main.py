@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
     faces = face_cascade.detectMultiScale(
-        imageForFacialDetection, scaleFactor=1.15, minNeighbors=9
+        imageForFacialDetection, scaleFactor=1.1, minNeighbors=9
     )
     gray = cv2.cvtColor(imageForFacialDetection, cv2.COLOR_BGR2GRAY)
 
