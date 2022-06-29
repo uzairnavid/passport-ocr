@@ -59,74 +59,78 @@ def read_mrz(mrz_text):
 
 
 if __name__ == "__main__":
-    uploaded_file = st.file_uploader("Passport Image", type=["png", "jpg", "jpeg"])
+    with st.echo(code_location="below"):
+        uploaded_file = st.file_uploader("Passport Image", type=["png", "jpg", "jpeg"])
 
-    if uploaded_file is not None:
-        # Convert the file to an opencv image.
-        file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
-        image = cv2.imdecode(file_bytes, 1)
-
-    if not image:
-        raise ("Unsupported file uploaded.")
-
-    info_dict = {}
-
-    print("Processing image")
-    image = deskew.deskew(image)
-    image = cv2.resize(image, None, fx=1.75, fy=1.75, interpolation=cv2.INTER_CUBIC)
-
-    face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-    faces = face_cascade.detectMultiScale(image, scaleFactor=1.15, minNeighbors=9)
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    for (x, y, w, h) in faces:
-        cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        roi_gray = gray[y : y + h, x : x + w]
-        roi_color = image[y : y + h, x : x + w]
-
-    cv2.imshow("img", image)
-    cv2.waitKey(0)
-
-    if image is not None:
-        image = cv2.bilateralFilter(image, 9, 75, 75)
-        thresh = cv2.threshold(image, 130, 255, cv2.THRESH_BINARY)[1]
-        morph_struct = cv2.getStructuringElement(cv2.MORPH_RECT, (4, 4))
-        thresh = cv2.erode(thresh, morph_struct, anchor=(-1, -1), iterations=1)
-        thresh = cv2.dilate(thresh, morph_struct, anchor=(-1, -1), iterations=1)
-
-        custom_config = r"-c tessedit_char_whitelist='ABCDEÉFGHIJKLMNOPQRSTUVWXYZ/-<1234567890 ' --psm 6"
-
-        text = pytesseract.image_to_string(image, config=custom_config, lang="ocrb")
-
-        if len(text) < 30:
-            print("No valid MRZ detected.")
+        if uploaded_file is not None:
+            # Convert the file to an opencv image.
+            file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
+            image = cv2.imdecode(file_bytes, 1)
+            if not image:
+                raise ("Unsupported file uploaded.")
         else:
-            text_split = text.split()
+            raise ("No file uploaded.")
 
-            mrz = []
-            for line in text_split:
-                if len(line) > 20 and "<" in line:
-                    mrz.append(line)
-            if len(mrz) < 2:
+        info_dict = {}
+
+        print("Processing image")
+        image = deskew.deskew(image)
+        image = cv2.resize(image, None, fx=1.75, fy=1.75, interpolation=cv2.INTER_CUBIC)
+
+        face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+        faces = face_cascade.detectMultiScale(image, scaleFactor=1.15, minNeighbors=9)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        for (x, y, w, h) in faces:
+            cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            roi_gray = gray[y : y + h, x : x + w]
+            roi_color = image[y : y + h, x : x + w]
+
+        cv2.imshow("img", image)
+        cv2.waitKey(0)
+
+        if image is not None:
+            image = cv2.bilateralFilter(image, 9, 75, 75)
+            thresh = cv2.threshold(image, 130, 255, cv2.THRESH_BINARY)[1]
+            morph_struct = cv2.getStructuringElement(cv2.MORPH_RECT, (4, 4))
+            thresh = cv2.erode(thresh, morph_struct, anchor=(-1, -1), iterations=1)
+            thresh = cv2.dilate(thresh, morph_struct, anchor=(-1, -1), iterations=1)
+
+            custom_config = r"-c tessedit_char_whitelist='ABCDEÉFGHIJKLMNOPQRSTUVWXYZ/-<1234567890 ' --psm 6"
+
+            text = pytesseract.image_to_string(image, config=custom_config, lang="ocrb")
+
+            if len(text) < 30:
                 print("No valid MRZ detected.")
             else:
-                mrz_text = "\n".join(mrz)
-                info_dict = read_mrz(mrz_text)
-                if mrz_text:
-                    if mrz_text[0] == "P":
-                        info_dict["document_type"] = "Passport"
-                    info_dict["mrz_text"] = mrz_text
+                text_split = text.split()
 
-            # Looks for the passport number in the entire OCR result, in case it can't be read from the MRZ properly
-            if (
-                "passport_number" not in info_dict
-                or len(info_dict["passport_number"]) < 8
-            ):
-                matches = re.findall(r"([A-C]{1}[0-9]{8})", text, flags=re.MULTILINE)
-                if matches:
-                    info_dict["passport_number"] = matches[0]
+                mrz = []
+                for line in text_split:
+                    if len(line) > 20 and "<" in line:
+                        mrz.append(line)
+                if len(mrz) < 2:
+                    print("No valid MRZ detected.")
+                else:
+                    mrz_text = "\n".join(mrz)
+                    info_dict = read_mrz(mrz_text)
+                    if mrz_text:
+                        if mrz_text[0] == "P":
+                            info_dict["document_type"] = "Passport"
+                        info_dict["mrz_text"] = mrz_text
 
-    if info_dict:
-        print(info_dict)
-    else:
-        print("Image invalid / unsupported")
+                # Looks for the passport number in the entire OCR result, in case it can't be read from the MRZ properly
+                if (
+                    "passport_number" not in info_dict
+                    or len(info_dict["passport_number"]) < 8
+                ):
+                    matches = re.findall(
+                        r"([A-C]{1}[0-9]{8})", text, flags=re.MULTILINE
+                    )
+                    if matches:
+                        info_dict["passport_number"] = matches[0]
+
+        if info_dict:
+            print(info_dict)
+        else:
+            print("Image invalid / unsupported")
