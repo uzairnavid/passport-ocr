@@ -8,7 +8,7 @@ numpy==1.22.4
     # via
     #   -r requirements.in
     #   opencv-contrib-python
-opencv-contrib-python==4.6.0.66
+opencv-python-headless==4.6.0.66
     # via -r requirements.in
 packaging==21.3
     # via pytesseract
