@@ -60,7 +60,7 @@ def read_mrz(mrz_text):
 
 
 if __name__ == "__main__":
-    st.title("Nigerian Passport OCR Demo")
+    st.title("Nigerian Passport OCR [Demo]")
     uploaded_file = st.file_uploader("Passport Image", type=["png", "jpg", "jpeg"])
 
     if uploaded_file is not None:
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     imageForFacialDetection = cv2.resize(
         image, None, fx=1.75, fy=1.75, interpolation=cv2.INTER_CUBIC
     )
-    image = cv2.resize(image, None, fx=1.75, fy=1.75, interpolation=cv2.INTER_CUBIC)
+    image = cv2.resize(image, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_CUBIC)
 
     face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
     faces = face_cascade.detectMultiScale(
