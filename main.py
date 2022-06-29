@@ -74,6 +74,12 @@ if __name__ == "__main__":
     info_dict = {}
 
     print("Processing image")
+    st.image(
+        image,
+        caption="Input image",
+        use_column_width=True,
+    )
+
     image = deskew.deskew(image)
     imageForFacialDetection = cv2.resize(
         image, None, fx=1.75, fy=1.75, interpolation=cv2.INTER_CUBIC
@@ -90,12 +96,6 @@ if __name__ == "__main__":
         cv2.rectangle(imageForFacialDetection, (x, y), (x + w, y + h), (255, 0, 0), 2)
         roi_gray = gray[y : y + h, x : x + w]
         roi_color = imageForFacialDetection[y : y + h, x : x + w]
-
-    st.image(
-        image,
-        caption="Facial detection result",
-        use_column_width=True,
-    )
 
     if image is not None:
         image = cv2.bilateralFilter(image, 9, 75, 75)
