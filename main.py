@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
         custom_config = r"-c tessedit_char_whitelist='ABCDEÉFGHIJKLMNOPQRSTUVWXYZ/-<1234567890 ' --psm 6"
 
-        text = pytesseract.image_to_string(image, config=custom_config, lang="ocrb")
+        text = pytesseract.image_to_string(image, config=custom_config)
 
         if len(text) < 30:
             print("No valid MRZ detected.")
