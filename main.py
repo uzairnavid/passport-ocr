@@ -66,8 +66,6 @@ if __name__ == "__main__":
             # Convert the file to an opencv image.
             file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
             image = cv2.imdecode(file_bytes, 1)
-            if not image:
-                raise ("Unsupported file uploaded.")
         else:
             raise ("No file uploaded.")
 
