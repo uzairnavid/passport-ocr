@@ -97,7 +97,7 @@ if __name__ == "__main__":
             2,
         )
         roi_gray = gray[y : y + h, x : x + w]
-        roi_color = imageForFacialDetection[y : y + h, x : x + w]
+        roi_color = imageForFaceDetection[y : y + h, x : x + w]
 
     st.image(
         imageForFaceDetection,
