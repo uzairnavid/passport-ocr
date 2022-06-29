@@ -77,20 +77,20 @@ if __name__ == "__main__":
     image = deskew.deskew(image)
     if image is None:
         st.write("Not a valid image of a passport")
-    imageForFacialDetection = cv2.resize(
+    imageForFaceDetection = cv2.resize(
         image, None, fx=1.75, fy=1.75, interpolation=cv2.INTER_CUBIC
     )
     image = cv2.resize(image, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_CUBIC)
 
     face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
     faces = face_cascade.detectMultiScale(
-        imageForFacialDetection, minSize=(60, 60), scaleFactor=1.1, minNeighbors=9
+        imageForFaceDetection, minSize=(60, 60), scaleFactor=1.1, minNeighbors=9
     )
-    gray = cv2.cvtColor(imageForFacialDetection, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(imageForFaceDetection, cv2.COLOR_BGR2GRAY)
 
     for (x, y, w, h) in faces:
         cv2.rectangle(
-            imageForFacialDetection,
+            imageForFaceDetection,
             (int(x - 0.1 * w), int(y - 0.25 * h)),
             (int(x + 1.1 * w), int(y + 1.25 * h)),
             (255, 0, 0),
@@ -100,8 +100,8 @@ if __name__ == "__main__":
         roi_color = imageForFacialDetection[y : y + h, x : x + w]
 
     st.image(
-        imageForFacialDetection,
-        caption="Facial detection result",
+        imageForFaceDetection,
+        caption="Face detection result",
         use_column_width=True,
         channels="BGR",
     )
