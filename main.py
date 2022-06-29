@@ -67,7 +67,7 @@ if __name__ == "__main__":
             file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
             image = cv2.imdecode(file_bytes, 1)
         else:
-            raise ("No file uploaded.")
+            print("No file uploaded.")
 
         info_dict = {}
 
