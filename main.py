@@ -92,7 +92,7 @@ if __name__ == "__main__":
         roi_color = imageForFacialDetection[y : y + h, x : x + w]
 
     st.image(
-        imageForFacialDetection,
+        image,
         caption="Facial detection result",
         use_column_width=True,
     )
