@@ -84,12 +84,18 @@ if __name__ == "__main__":
 
     face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
     faces = face_cascade.detectMultiScale(
-        imageForFacialDetection, scaleFactor=1.1, minNeighbors=9
+        imageForFacialDetection, minSize=(60, 60), scaleFactor=1.1, minNeighbors=9
     )
     gray = cv2.cvtColor(imageForFacialDetection, cv2.COLOR_BGR2GRAY)
 
     for (x, y, w, h) in faces:
-        cv2.rectangle(imageForFacialDetection, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        cv2.rectangle(
+            imageForFacialDetection,
+            (int(x - 0.1 * w), int(y - 0.25 * h)),
+            (int(x + 1.1 * w), int(y + 1.25 * h)),
+            (255, 0, 0),
+            2,
+        )
         roi_gray = gray[y : y + h, x : x + w]
         roi_color = imageForFacialDetection[y : y + h, x : x + w]
 
