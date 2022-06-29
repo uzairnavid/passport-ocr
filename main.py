@@ -65,22 +65,18 @@ if __name__ == "__main__":
 
     if uploaded_file is not None:
         # Convert the file to an opencv image.
+        st.markdown("Processing uploaded image")
         file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
         image = cv2.imdecode(file_bytes, 1)
     else:
-        print("No file uploaded. Using demo image.")
+        st.markdown("**No file uploaded.** Using sample image.")
         image = cv2.imread("sample.jpeg", cv2.IMREAD_COLOR)
 
     info_dict = {}
 
-    print("Processing image")
-    st.image(
-        image,
-        caption="Input image",
-        use_column_width=True,
-    )
-
     image = deskew.deskew(image)
+    if image is None:
+        st.write("Not a valid image of a passport")
     imageForFacialDetection = cv2.resize(
         image, None, fx=1.75, fy=1.75, interpolation=cv2.INTER_CUBIC
     )
@@ -97,6 +93,13 @@ if __name__ == "__main__":
         roi_gray = gray[y : y + h, x : x + w]
         roi_color = imageForFacialDetection[y : y + h, x : x + w]
 
+    st.image(
+        imageForFacialDetection,
+        caption="Facial detection result",
+        use_column_width=True,
+        channels="BGR",
+    )
+
     if image is not None:
         image = cv2.bilateralFilter(image, 9, 75, 75)
         thresh = cv2.threshold(image, 130, 255, cv2.THRESH_BINARY)[1]
@@ -104,12 +107,11 @@ if __name__ == "__main__":
         thresh = cv2.erode(thresh, morph_struct, anchor=(-1, -1), iterations=1)
         thresh = cv2.dilate(thresh, morph_struct, anchor=(-1, -1), iterations=1)
 
-        custom_config = r"-c tessedit_char_whitelist='ABCDEÉFGHIJKLMNOPQRSTUVWXYZ/-<1234567890 ' --psm 6"
-
-        text = pytesseract.image_to_string(image, config=custom_config)
+        custom_config = r"-c tessedit_char_whitelist='ABCDEÉFGHIJKLMNOPQRSTUVWXYZ/-<1234567890 ' --psm 6 --tessdata-dir ."
+        text = pytesseract.image_to_string(image, config=custom_config, lang="ocrb")
 
         if len(text) < 30:
-            print("No valid MRZ detected.")
+            st.write("MRZ malformed or unreadable.")
         else:
             text_split = text.split()
 
@@ -118,7 +120,7 @@ if __name__ == "__main__":
                 if len(line) > 20 and "<" in line:
                     mrz.append(line)
             if len(mrz) < 2:
-                print("No valid MRZ detected.")
+                st.write("MRZ malformed or unreadable.")
             else:
                 mrz_text = "\n".join(mrz)
                 info_dict = read_mrz(mrz_text)
@@ -137,6 +139,11 @@ if __name__ == "__main__":
                     info_dict["passport_number"] = matches[0]
 
     if info_dict:
-        st.write(pprint.pformat(info_dict))
+        st.subheader("OCR Results")
+        for key, val in info_dict.items():
+            if type(val) is datetime.datetime:
+                st.markdown("**" + key + "**: " + val.strftime("%dth %B %Y"))
+            else:
+                st.markdown("**" + key + "**: " + val)
     else:
-        st.write("Image invalid / unsupported")
+        st.subheader("Error: Not a valid image of a Nigerian Passport")
