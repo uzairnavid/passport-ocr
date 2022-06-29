@@ -11,6 +11,7 @@ import deskew
 import streamlit as st
 
 
+@st.cache
 def cleanAndConvertDate(date_str):
     if date_str == "":
         return date_str
@@ -20,6 +21,7 @@ def cleanAndConvertDate(date_str):
     return datetime.datetime.strptime(cleaned_date, date_format)
 
 
+@st.cache
 def read_mrz(mrz_text):
     mrz_details = {}
     line_one_pattern = r"P<NGA(\w+)<<(\w+<?\w*)<*"
