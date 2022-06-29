@@ -7,6 +7,7 @@ import numpy as np
 import math
 from PIL import Image
 import deskew
+import streamlit as st
 
 
 def cleanAndConvertDate(date_str):
@@ -58,14 +59,20 @@ def read_mrz(mrz_text):
 
 
 if __name__ == "__main__":
-    # construct the argument parser and parse the arguments
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-i", "--image", required=True, help="path to input image")
-    args = vars(ap.parse_args())
+    uploaded_file = st.file_uploader("Passport Image", type=["png", "jpg", "jpeg"])
+
+    if uploaded_file is not None:
+        # Convert the file to an opencv image.
+        file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
+        image = cv2.imdecode(file_bytes, 1)
+
+    if not image:
+        raise ("Unsupported file uploaded.")
+
     info_dict = {}
 
     print("Processing image")
-    image = deskew.deskew(args["image"])
+    image = deskew.deskew(image)
     image = cv2.resize(image, None, fx=1.75, fy=1.75, interpolation=cv2.INTER_CUBIC)
 
     face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")

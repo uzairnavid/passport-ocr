@@ -5,8 +5,7 @@ import math
 from PIL import Image
 
 
-def deskew(image_path):
-    src = cv2.imread(image_path, cv2.IMREAD_COLOR)
+def deskew(src):
     gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
     kernel = np.ones((5, 5), np.uint8)
     erode_Img = cv2.erode(gray, kernel)
