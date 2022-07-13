@@ -4,6 +4,7 @@
 #
 #    pip-compile
 #
+matplotlib==3.5.2
 numpy==1.22.4
     # via
     #   -r requirements.in
