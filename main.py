@@ -62,7 +62,6 @@ def detect_blur_fft(image, size=60, thresh=15, vis=False):
     return mean <= thresh
 
 
-@st.cache
 def cleanAndConvertDate(date_str):
     if date_str == "":
         return date_str
