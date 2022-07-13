@@ -145,8 +145,6 @@ def detectPassport(image):
         )
     return im_dst
 
-
-@st.cache
 def read_mrz(mrz_text):
     mrz_details = {}
     line_one_pattern = r"P<NGA(\w+)<<(\w+<?\w*)<*"
